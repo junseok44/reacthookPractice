@@ -1,23 +1,26 @@
-import logo from './logo.svg';
-import './App.css';
+const useNotification = (callback) => {
+  if (!(Notification in window)) {
+    console.log("no notification");
+    return;
+  }
+  const onClick = () => {
+    Notification.requestPermission().then((result) => {
+      console.log(result);
+    });
+
+    callback();
+  };
+
+  return onClick;
+};
 
 function App() {
+  const hello = () => console.log("hello");
+  const onClick = useNotification(hello);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <h1>whell</h1>
+      <button onClick={onClick}> don't click here</button>
     </div>
   );
 }
