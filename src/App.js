@@ -1,26 +1,26 @@
-const useNotification = (callback) => {
-  if (!(Notification in window)) {
-    console.log("no notification");
-    return;
-  }
-  const onClick = () => {
-    Notification.requestPermission().then((result) => {
-      console.log(result);
-    });
+import { useEffect, useRef } from "react";
 
-    callback();
-  };
+const useHover = (handler) => {
+  const h1Element = useRef();
 
-  return onClick;
+  useEffect(() => {
+    const { current } = h1Element;
+    if (current) {
+      current.addEventListener("mouseover", handler);
+    }
+    return () => current.removeEventListener("mouseover", handler);
+  });
+
+  return h1Element;
 };
 
 function App() {
   const hello = () => console.log("hello");
-  const onClick = useNotification(hello);
+
+  const h1Element = useHover(hello);
   return (
     <div>
-      <h1>whell</h1>
-      <button onClick={onClick}> don't click here</button>
+      <h1 ref={h1Element}>hello</h1>
     </div>
   );
 }

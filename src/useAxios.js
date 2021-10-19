@@ -1,43 +1,67 @@
-import defaultAxios from "axios";
 import { useEffect, useState } from "react";
+import axios from "axios";
 
-const useAxios = (opts, axiosInstance = defaultAxios) => {
-  const [state, setState] = useState({
-    loading: true,
+import "./App.css";
+
+export const useAxios = (url, opt) => {
+  const [currentState, setcurrentState] = useState({
+    data: [],
     error: null,
-    data: null,
+    loading: true,
   });
-  const [trigger, setTrigger] = useState(0);
-  const reFetch = () => {
-    setState({
-      ...state,
-      loading: true,
-      data: null,
-    });
-    setTrigger(Date.now());
-  };
-  useEffect(() => {
-    axiosInstance(opts)
-      .then((result) => {
-        setState({
-          ...state,
+
+  const clickChange = () => {
+    axios
+      .get(url)
+      .then((data) => {
+        setcurrentState({
+          ...currentState,
           loading: false,
-          data: result,
+          data: data.data.data.movies,
         });
       })
       .catch((error) => {
-        setState({
-          ...state,
+        setcurrentState({
+          ...currentState,
           error: error,
         });
       });
-  }, [trigger]);
-
-  if (!opts.url) {
-    return;
-  }
-
-  return { state, reFetch };
+  };
+  const [reFetchNumber, setreFetchNumber] = useState(0);
+  const reFetch = () => {
+    setreFetchNumber(Math.random());
+  };
+  useEffect(() => {
+    setcurrentState({
+      ...currentState,
+      loading: true,
+      error: null,
+    });
+    clickChange();
+  }, [reFetchNumber]);
+  return { currentState, clickChange, reFetch };
 };
 
-export default useAxios;
+function App() {
+  const { currentState, clickChange, reFetch } = useAxios(
+    "https://yts.mx/api/v2/list_movies.json"
+  );
+  return (
+    <div>
+      <h1>the title of the movies</h1>
+      <h3>
+        {currentState.loading
+          ? currentState.error
+            ? currentState.error.message
+            : "Loading..."
+          : currentState.data.map((movie) => {
+              return <li key={movie.id}>{movie.title}</li>;
+            })}
+      </h3>
+      <button onClick={clickChange}>get data</button>
+      <button onClick={reFetch}>get again</button>
+    </div>
+  );
+}
+
+export default App;
