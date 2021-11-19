@@ -1,26 +1,37 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import "./App.css";
 
-const useHover = (handler) => {
-  const h1Element = useRef();
+const useScroll = () => {
+  const title = useRef();
+  const [y, changeY] = useState(window.scrollY);
+  window.addEventListener("wheel", function () {
+    changeY(window.scrollY);
+  });
+  console.log(y);
+  //useEffect 부분 다시 공부하기
 
   useEffect(() => {
-    const { current } = h1Element;
-    if (current) {
-      current.addEventListener("mouseover", handler);
+    if (title.current) {
+      if (y >= 500) {
+        title.current.style.height = "8vh";
+        title.current.style.fontSize = "1rem";
+      } else {
+        title.current.style.height = "15vh";
+        title.current.style.fontSize = "2rem";
+      }
+    } else {
+      return;
     }
-    return () => current.removeEventListener("mouseover", handler);
   });
 
-  return h1Element;
+  return title;
 };
 
 function App() {
-  const hello = () => console.log("hello");
-
-  const h1Element = useHover(hello);
+  const title = useScroll();
   return (
-    <div>
-      <h1 ref={h1Element}>hello</h1>
+    <div ref={title} className="header">
+      Hello
     </div>
   );
 }
